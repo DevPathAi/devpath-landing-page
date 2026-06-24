@@ -43,7 +43,9 @@ export async function onRequestPost(context) {
     });
   } catch { return json({ error: 'llm_unavailable' }, 503); }
 
-  await addBudget(env.INTERVIEW_KV, (out.usage.input_tokens || 0) + (out.usage.output_tokens || 0), now);
+  try {
+    await addBudget(env.INTERVIEW_KV, (out.usage.input_tokens || 0) + (out.usage.output_tokens || 0), now);
+  } catch (e) { /* non-fatal: budget write failed, still return the answer */ }
 
   const text = (out.text || '').trim();
   const done = text.includes(READY_TOKEN) || userTurns + 1 >= MAX_TURNS;

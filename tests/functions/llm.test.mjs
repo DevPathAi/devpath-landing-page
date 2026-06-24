@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { toClaudeMessages, callClaude, MODEL_TURN } from '../../functions/api/_lib/llm.js';
+import { toClaudeMessages, callClaude, MODEL_TURN, streamClaude, MODEL_ANSWER } from '../../functions/api/_lib/llm.js';
 
 test('toClaudeMessages maps roles and coerces unknown to assistant', () => {
   assert.deepEqual(
@@ -27,4 +27,12 @@ test('callClaude posts to messages API and extracts text', async () => {
 test('callClaude throws on non-ok', async () => {
   const fetchImpl = async () => ({ ok: false, status: 429, json: async () => ({}) });
   await assert.rejects(() => callClaude({ apiKey: 'k', model: MODEL_TURN, system: 's', messages: [], fetchImpl }), /429/);
+});
+
+test('streamClaude sends stream:true with the answer model', async () => {
+  let captured;
+  const fetchImpl = async (url, init) => { captured = JSON.parse(init.body); return { ok: true, body: null }; };
+  await streamClaude({ apiKey: 'k', model: MODEL_ANSWER, system: 's', messages: [{ role: 'user', content: 'x' }], fetchImpl });
+  assert.equal(captured.stream, true);
+  assert.equal(captured.model, 'claude-sonnet-4-6');
 });

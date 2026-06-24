@@ -37,11 +37,19 @@ export function genericAnswerSystem() {
   return '너는 Java/Spring 학습 도우미다. 주어진 질문에 일반적인 답을 한국어로 간결히 제시해라. 학습자 개인 맥락은 모른다.';
 }
 
+const STAGE_LABELS = {
+  job_seeker: '취업 준비생',
+  junior_dev: '주니어 현직자',
+  self_taught: '비전공 독학자',
+  other: '기타',
+};
+
 export function contextAnswerSystem(stage) {
+  const label = STAGE_LABELS[stage] || '미상';
   return [
     '너는 Java/Spring 학습 도우미다.',
     '아래에 학습자와의 인터뷰 전사와 현재 학습 단계가 주어진다.',
-    `학습자 단계: ${stage || '미상'}.`,
+    `학습자 단계: ${label}.`,
     '이 맥락을 적극 반영해, 질문에 대한 답을 학습자 상황에 맞춰 한국어로 제시해라.',
   ].join('\n');
 }

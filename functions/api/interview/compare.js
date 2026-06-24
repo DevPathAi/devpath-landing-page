@@ -8,6 +8,7 @@ function sse(controller, enc, obj) {
 
 // Reads an Anthropic SSE Response and invokes onText(delta) for each text_delta.
 async function pipeAnthropicText(res, onText) {
+  if (!res.ok) throw new Error(`stream_error_${res.status}`);
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = '';
@@ -60,7 +61,9 @@ export async function onRequestPost(context) {
           maxTokens: 120,
         });
         const question = (distill.text || '').trim();
-        await addBudget(env.INTERVIEW_KV, (distill.usage.input_tokens || 0) + (distill.usage.output_tokens || 0), now);
+        try {
+          await addBudget(env.INTERVIEW_KV, (distill.usage.input_tokens || 0) + (distill.usage.output_tokens || 0), now);
+        } catch (e) { /* non-fatal */ }
         sse(controller, enc, { type: 'distilled', question });
 
         // 2) generic answer (Sonnet, streamed) — no context

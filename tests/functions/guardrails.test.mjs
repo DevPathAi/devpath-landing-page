@@ -36,3 +36,8 @@ test('budget accumulates and trips cap', async () => {
   await addBudget(kv, 150, now);
   assert.equal(await overBudget(kv, now, { cap: 100 }), true);
 });
+
+test('verifyTurnstile fails closed on missing secret', async () => {
+  const fetchImpl = async () => ({ json: async () => ({ success: true }) });
+  assert.equal(await verifyTurnstile('tok', '1.2.3.4', '', fetchImpl), false);
+});
