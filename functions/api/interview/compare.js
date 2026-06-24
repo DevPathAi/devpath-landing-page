@@ -1,4 +1,4 @@
-import { distillSystem, genericAnswerSystem, contextAnswerSystem, MAX_TURNS, MAX_MSG_CHARS } from '../_lib/prompts.js';
+import { distillSystem, genericAnswerSystem, contextAnswerSystem, resolveDistilledQuestion, MAX_TURNS, MAX_MSG_CHARS } from '../_lib/prompts.js';
 import { toClaudeMessages, callClaude, streamClaude, MODEL_TURN, MODEL_ANSWER } from '../_lib/llm.js';
 import { verifyTurnstile, enforceInputCaps, checkRateLimit, addBudget, overBudget } from '../_lib/guardrails.js';
 
@@ -64,11 +64,7 @@ export async function onRequestPost(context) {
           messages: toClaudeMessages(transcript),
           maxTokens: 120,
         });
-        let question = (distill.text || '').trim();
-        if (!question) {
-          const lastUser = [...transcript].reverse().find((m) => m && m.role === 'user');
-          question = lastUser && lastUser.text ? String(lastUser.text).slice(0, 300) : '제 상황에 맞는 학습 조언을 해주세요.';
-        }
+        const question = resolveDistilledQuestion(distill.text, transcript);
         try {
           await addBudget(env.INTERVIEW_KV, (distill.usage.input_tokens || 0) + (distill.usage.output_tokens || 0), now);
         } catch (e) { /* non-fatal */ }
