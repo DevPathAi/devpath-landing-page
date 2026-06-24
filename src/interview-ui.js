@@ -138,7 +138,11 @@ export function initInterview(root, { config }) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!userChoice) { setStatus('어느 답변이 더 유용했는지 선택해주세요.', 'error'); return; }
-      form.remove(); await save(Number(range.value));
+      if (btn.disabled) return;
+      btn.disabled = true;
+      const ok = await save(Number(range.value));
+      if (ok) form.remove();
+      else btn.disabled = false;
     });
   }
 
@@ -150,7 +154,7 @@ export function initInterview(root, { config }) {
       { distilledQuestion: distilled, contextSide: blind.contextSide, userChoice, rating },
       { ...attribution, consentVersion: config.consentVersion, landingVariant: config.landingVariant },
     );
-    if (!config.endpoint) { setStatus('저장 URL이 설정되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error'); return; }
+    if (!config.endpoint) { setStatus('저장 URL이 설정되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error'); return false; }
     try {
       const res = await fetch(config.endpoint, { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error(`저장 서버 오류 (${res.status})`);
@@ -158,7 +162,8 @@ export function initInterview(root, { config }) {
       if (!result.ok) throw new Error(result.error || '저장 실패');
       setStatus('');
       root.append(el('div', 'iv-done', '신청이 완료되었습니다! 베타 우선 초대 대상자에게 이메일로 연락드리겠습니다.'));
-    } catch (err) { setStatus(`저장 오류: ${err.message}`, 'error'); }
+      return true;
+    } catch (err) { setStatus(`저장 오류: ${err.message}`, 'error'); return false; }
   }
 
   if (!window.DEVPATH_TURNSTILE_SITEKEY) {

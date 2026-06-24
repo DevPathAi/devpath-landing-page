@@ -20,7 +20,6 @@ const HEADERS = [
   'stack',
   'recent_stuck_moment',
   'wtp_krw',
-  'interview_opt_in',
   'pain_specificity_score',
   'spring_fit_score',
   'source_quality_score',
