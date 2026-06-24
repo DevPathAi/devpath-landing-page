@@ -146,3 +146,52 @@ test('pickBlindOrder maps even/odd seed to deterministic blind order', () => {
   assert.deepEqual(pickBlindOrder(2), { contextSide: 1, order: ['context', 'generic'] });
   assert.equal(pickBlindOrder(undefined).contextSide, 1);
 });
+
+test('sanitizeTranscript blanks sensitive user turns, keeps assistant turns', () => {
+  const result = sanitizeTranscript([
+    { role: 'assistant', text: '최근 어떤 걸 공부하다 막혔나요?' },
+    { role: 'user', text: 'JPA N+1이 헷갈립니다.' },
+    { role: 'user', text: 'https://github.com/acme/repo 참고하세요' },
+  ]);
+  assert.deepEqual(result, [
+    { role: 'assistant', text: '최근 어떤 걸 공부하다 막혔나요?' },
+    { role: 'user', text: 'JPA N+1이 헷갈립니다.' },
+    { role: 'user', text: '' },
+  ]);
+  assert.deepEqual(sanitizeTranscript(null), []);
+});
+
+test('buildInterviewPayload assembles storage payload with sanitized transcript', () => {
+  const payload = buildInterviewPayload(
+    { lead_id: 'lead-9', email: ' Learner@Example.com ', current_stage: 'job_seeker', consent_required: true },
+    [
+      { role: 'assistant', text: '무엇이 막혔나요?' },
+      { role: 'user', text: 'JPA 트랜잭션 경계가 헷갈립니다.' },
+      { role: 'user', text: 'token: abc123' },
+    ],
+    { distilledQuestion: 'JPA 트랜잭션 경계를 어떻게 잡나요?', contextSide: 1, userChoice: 1, rating: 4 },
+    { now: '2026-06-24T01:00:00.000Z', consentVersion: 'aiqa-test', utm_source: 'github', landingVariant: 'aiqa-v1' },
+  );
+  assert.equal(payload.action, 'interview');
+  assert.equal(payload.email_normalized, 'learner@example.com');
+  assert.equal(payload.interview_turns, 2);
+  assert.equal(payload.ab_rating_1to5, 4);
+  assert.equal(payload.recent_stuck_moment, 'JPA 트랜잭션 경계를 어떻게 잡나요?');
+  assert.equal(payload.ab_distilled_question, 'JPA 트랜잭션 경계를 어떻게 잡나요?');
+  assert.equal(payload.consent_version, 'aiqa-test');
+  const t = JSON.parse(payload.interview_transcript);
+  assert.equal(t[2].text, '');
+});
+
+test('buildInterviewPayload leaves rating/side blank when not provided', () => {
+  const payload = buildInterviewPayload(
+    { lead_id: 'l', email: 'a@b.co', current_stage: 'other', consent_required: true },
+    [{ role: 'user', text: '막힘' }],
+    { distilledQuestion: 'q' },
+    { now: '2026-06-24T01:00:00.000Z' },
+  );
+  assert.equal(payload.ab_rating_1to5, '');
+  assert.equal(payload.ab_context_side, '');
+  assert.equal(payload.ab_user_choice, '');
+  assert.equal(payload.landing_variant, 'aiqa-v1');
+});
