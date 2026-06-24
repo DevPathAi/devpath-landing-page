@@ -26,20 +26,35 @@ export function enforceInputCaps(history, { maxTurns, maxMsgChars }) {
 }
 
 export async function checkRateLimit(kv, ip, nowMs, { perMin = RL_PER_MIN } = {}) {
-  const key = `rl:${ip}:${minuteBucket(nowMs)}`;
-  const count = Number(await kv.get(key)) || 0;
-  if (count >= perMin) return 'rate_limited';
-  await kv.put(key, String(count + 1), { expirationTtl: 120 });
-  return null;
+  if (!kv) { console.error('INTERVIEW_KV not bound — rate limiting disabled'); return null; }
+  try {
+    const key = `rl:${ip}:${minuteBucket(nowMs)}`;
+    const count = Number(await kv.get(key)) || 0;
+    if (count >= perMin) return 'rate_limited';
+    await kv.put(key, String(count + 1), { expirationTtl: 120 });
+    return null;
+  } catch (e) {
+    console.error('checkRateLimit KV error', e);
+    return null;
+  }
 }
 
 export async function addBudget(kv, tokens, nowMs) {
-  const key = `budget:${dayBucket(nowMs)}`;
-  const cur = Number(await kv.get(key)) || 0;
-  await kv.put(key, String(cur + (Number(tokens) || 0)), { expirationTtl: 90_000 });
+  if (!kv) return;
+  try {
+    const key = `budget:${dayBucket(nowMs)}`;
+    const cur = Number(await kv.get(key)) || 0;
+    await kv.put(key, String(cur + (Number(tokens) || 0)), { expirationTtl: 90_000 });
+  } catch (e) { /* non-fatal: budget write best-effort */ }
 }
 
 export async function overBudget(kv, nowMs, { cap = BUDGET_PER_DAY } = {}) {
-  const key = `budget:${dayBucket(nowMs)}`;
-  return (Number(await kv.get(key)) || 0) >= cap;
+  if (!kv) return false;
+  try {
+    const key = `budget:${dayBucket(nowMs)}`;
+    return (Number(await kv.get(key)) || 0) >= cap;
+  } catch (e) {
+    console.error('overBudget KV error', e);
+    return false;
+  }
 }
