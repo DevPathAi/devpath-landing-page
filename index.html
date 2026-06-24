@@ -38,6 +38,7 @@
         window.__turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
           sitekey: window.DEVPATH_TURNSTILE_SITEKEY,
           execution: 'execute',
+          appearance: 'interaction-only',
           theme: 'dark',
           callback: __resolveTurnstile,
           'error-callback': function () { __resolveTurnstile(''); return true; },
