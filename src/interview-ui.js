@@ -111,7 +111,7 @@ export function initInterview(root, { config }) {
           else if (evt.type === 'generic') { answers.generic += evt.delta || ''; cards.update('generic'); }
           else if (evt.type === 'context') { answers.context += evt.delta || ''; cards.update('context'); }
           else if (evt.type === 'done') { setStatus(''); renderRating(); }
-          else if (evt.type === 'error') { setStatus('생성 중 오류가 발생했습니다. 다시 시도해주세요.', 'error'); }
+          else if (evt.type === 'error') { setStatus('생성 중 오류: ' + (evt.message || '') + ' — 다시 시도해주세요.', 'error'); }
         },
       });
     } catch (err) {

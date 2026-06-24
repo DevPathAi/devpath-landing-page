@@ -90,7 +90,8 @@ export async function onRequestPost(context) {
 
         sse(controller, enc, { type: 'done' });
       } catch (e) {
-        sse(controller, enc, { type: 'error', message: 'llm_unavailable' });
+        console.error('compare_error', e);
+        sse(controller, enc, { type: 'error', message: String((e && e.message) || 'error') });
       } finally {
         controller.close();
       }
