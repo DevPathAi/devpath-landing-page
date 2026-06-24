@@ -8,7 +8,11 @@ function sse(controller, enc, obj) {
 
 // Reads an Anthropic SSE Response and invokes onText(delta) for each text_delta.
 async function pipeAnthropicText(res, onText) {
-  if (!res.ok) throw new Error(`stream_error_${res.status}`);
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.text()).slice(0, 300); } catch (e) {}
+    throw new Error(`stream_error_${res.status}${detail ? ': ' + detail : ''}`);
+  }
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = '';
@@ -60,7 +64,11 @@ export async function onRequestPost(context) {
           messages: toClaudeMessages(transcript),
           maxTokens: 120,
         });
-        const question = (distill.text || '').trim();
+        let question = (distill.text || '').trim();
+        if (!question) {
+          const lastUser = [...transcript].reverse().find((m) => m && m.role === 'user');
+          question = lastUser && lastUser.text ? String(lastUser.text).slice(0, 300) : '제 상황에 맞는 학습 조언을 해주세요.';
+        }
         try {
           await addBudget(env.INTERVIEW_KV, (distill.usage.input_tokens || 0) + (distill.usage.output_tokens || 0), now);
         } catch (e) { /* non-fatal */ }

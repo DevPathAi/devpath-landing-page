@@ -22,7 +22,11 @@ export async function callClaude({ apiKey, model, system, messages, maxTokens = 
     headers: headers(apiKey),
     body: JSON.stringify({ model, max_tokens: maxTokens, system, messages }),
   });
-  if (!res.ok) throw new Error(`anthropic_error_${res.status}`);
+  if (!res.ok) {
+    let detail = '';
+    try { detail = (await res.text()).slice(0, 300); } catch (e) {}
+    throw new Error(`anthropic_error_${res.status}${detail ? ': ' + detail : ''}`);
+  }
   const data = await res.json();
   const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
   return { text, usage: data.usage || {} };
