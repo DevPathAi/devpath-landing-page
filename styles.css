@@ -20,7 +20,7 @@
 html {
   line-height: 1.6;
   scroll-behavior: smooth;
-  scroll-padding-top: 72px;
+  scroll-padding-top: 80px;
 }
 
 body {
@@ -321,6 +321,31 @@ h1 .hl { color: var(--cyan); }
   border-radius: 6px;
 }
 .chip b { color: var(--green); font-weight: 700; }
+
+.hero-cta { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+.cta-primary, .cta-secondary {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: filter 0.15s, transform 0.05s, box-shadow 0.2s, border-color 0.15s, color 0.15s;
+}
+.cta-primary {
+  border: 1px solid #2ea043;
+  background: linear-gradient(180deg, #2ea043, #238636);
+  color: #f0fff4;
+}
+.cta-primary::before { content: "> "; color: rgba(255, 255, 255, 0.7); }
+.cta-primary:hover { filter: brightness(1.08); box-shadow: 0 4px 16px rgba(46, 160, 67, 0.25); }
+.cta-primary:active { transform: translateY(1px); }
+.cta-secondary {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--inset);
+}
+.cta-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
 
 /* ── Timeline ── */
 .timeline-section {
