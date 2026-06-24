@@ -256,7 +256,7 @@ function renderMarkdownInto(container, md) {
   const lines = String(md || '').split('\n');
   let i = 0, list = null;
   const flush = () => { if (list) { container.appendChild(list); list = null; } };
-  const special = (l) => /^```/.test(l) || /^#{1,6}\s/.test(l) || /^\s*[-*]\s/.test(l) || /^\s*\d+\.\s/.test(l) || /^---+\s*$/.test(l) || /^\s*$/.test(l);
+  const special = (l) => /^```/.test(l) || /^#{1,6}\s/.test(l) || /^\s*[-*]\s/.test(l) || /^\s*\d+\.\s/.test(l) || /^---+\s*$/.test(l) || /^\s*\|.*\|\s*$/.test(l) || /^\s*$/.test(l);
   while (i < lines.length) {
     const line = lines[i];
     let m;
@@ -267,6 +267,24 @@ function renderMarkdownInto(container, md) {
       i++;
       const pre = document.createElement('pre'); const c = document.createElement('code');
       c.textContent = code.join('\n'); pre.appendChild(c); container.appendChild(pre);
+      continue;
+    }
+    // table: a `| a | b |` row immediately followed by a `|---|---|` separator
+    if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+      flush();
+      const splitRow = (l) => l.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map((s) => s.trim());
+      const table = document.createElement('table');
+      const thead = document.createElement('thead'); const htr = document.createElement('tr');
+      splitRow(line).forEach((cell) => { const th = document.createElement('th'); mdInline(th, cell); htr.appendChild(th); });
+      thead.appendChild(htr); table.appendChild(thead);
+      i += 2;
+      const tbody = document.createElement('tbody');
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) {
+        const tr = document.createElement('tr');
+        splitRow(lines[i]).forEach((cell) => { const td = document.createElement('td'); mdInline(td, cell); tr.appendChild(td); });
+        tbody.appendChild(tr); i += 1;
+      }
+      table.appendChild(tbody); container.appendChild(table);
       continue;
     }
     if ((m = line.match(/^(#{1,6})\s+(.*)$/))) {
