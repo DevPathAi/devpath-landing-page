@@ -38,6 +38,7 @@
         window.__turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
           sitekey: window.DEVPATH_TURNSTILE_SITEKEY,
           execution: 'execute',
+          appearance: 'interaction-only',
           theme: 'dark',
           callback: __resolveTurnstile,
           'error-callback': function () { __resolveTurnstile(''); return true; },
@@ -102,6 +103,10 @@
             <span class="chip"><b>online</b> 온라인 5분</span>
             <span class="chip"><b>target</b> 주니어&middot;취준 우선</span>
             <span class="chip"><b>reward</b> 맥락 답변 즉시 체험</span>
+          </div>
+          <div class="hero-cta">
+            <a href="#apply" class="cta-primary">AI 진단 시작하기</a>
+            <a href="#how-it-works" class="cta-secondary">진행 방식 보기</a>
           </div>
         </div>
       </section>
