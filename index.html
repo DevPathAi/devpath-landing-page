@@ -25,16 +25,44 @@
       window.DEVPATH_FORM_ENDPOINT = '';
       window.DEVPATH_CONSENT_VERSION = '2026-06-24-aiqa-v1';
       window.DEVPATH_LANDING_VARIANT = 'aiqa-v1';
-      window.DEVPATH_TURNSTILE_SITEKEY = '';
-      window.__turnstileToken = '';
-      function onTurnstile(token) { window.__turnstileToken = token; }
-      window.addEventListener('DOMContentLoaded', function () {
-        var s = window.DEVPATH_TURNSTILE_SITEKEY;
-        var w = document.getElementById('turnstile-widget');
-        if (s && w) w.setAttribute('data-sitekey', s);
-      });
+      window.DEVPATH_TURNSTILE_SITEKEY = '0x4AAAAAADqKmqKdMK_GFF6M';
+      window.__turnstileWidgetId = null;
+      var __turnstileResolvers = [];
+      function __resolveTurnstile(token) {
+        var rs = __turnstileResolvers; __turnstileResolvers = [];
+        for (var i = 0; i < rs.length; i++) rs[i](token || '');
+      }
+      // Called by the Turnstile script (?onload=onloadTurnstile) once it is ready.
+      window.onloadTurnstile = function () {
+        if (!window.DEVPATH_TURNSTILE_SITEKEY || !window.turnstile) return;
+        window.__turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
+          sitekey: window.DEVPATH_TURNSTILE_SITEKEY,
+          execution: 'execute',
+          theme: 'dark',
+          callback: __resolveTurnstile,
+          'error-callback': function () { __resolveTurnstile(''); return true; },
+          'timeout-callback': function () { __resolveTurnstile(''); }
+        });
+      };
+      // Returns Promise<string> with a FRESH single-use token ('' on failure/timeout).
+      // Turnstile tokens are single-use, so each protected call (first /turn, /compare) mints a new one.
+      window.devpathFreshTurnstileToken = function () {
+        return new Promise(function (resolve) {
+          if (!window.turnstile || window.__turnstileWidgetId == null) { resolve(''); return; }
+          var settled = false;
+          var finish = function (t) { if (settled) return; settled = true; resolve(t || ''); };
+          __turnstileResolvers.push(finish);
+          try { window.turnstile.reset(window.__turnstileWidgetId); } catch (e) {}
+          try { window.turnstile.execute(window.__turnstileWidgetId); } catch (e) {}
+          setTimeout(function () {
+            var i = __turnstileResolvers.indexOf(finish);
+            if (i >= 0) __turnstileResolvers.splice(i, 1);
+            finish('');
+          }, 10000);
+        });
+      };
     </script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onloadTurnstile" async defer></script>
     <!-- file:// 에서도 동작하도록 비-module 번들 사용 (npm run build 로 생성). -->
     <script src="src/app.bundle.js" defer></script>
   </head>
@@ -126,8 +154,7 @@
         </div>
         <div class="console">
           <div id="interview-root" class="interview-root"></div>
-          <div id="turnstile-widget" class="cf-turnstile"
-               data-sitekey="" data-callback="onTurnstile" data-theme="dark"></div>
+          <div id="turnstile-widget"></div>
         </div>
       </section>
 

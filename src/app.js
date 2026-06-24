@@ -13,7 +13,7 @@ const landingVariant = window.DEVPATH_LANDING_VARIANT || 'aiqa-v1';
       endpoint,
       consentVersion,
       landingVariant,
-      turnstileToken: () => (window.turnstile && window.__turnstileToken) || '',
+      turnstileToken: () => (window.devpathFreshTurnstileToken ? window.devpathFreshTurnstileToken() : Promise.resolve('')),
     },
   });
 })();
