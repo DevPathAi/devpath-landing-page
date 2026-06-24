@@ -20,7 +20,6 @@ const HEADERS = [
   'stack',
   'recent_stuck_moment',
   'wtp_krw',
-  'interview_opt_in',
   'pain_specificity_score',
   'spring_fit_score',
   'source_quality_score',
@@ -32,6 +31,13 @@ const HEADERS = [
   'completed_at',
   'honorarium_paid_at',
   'insight_coded_at',
+  'interview_transcript',
+  'interview_turns',
+  'ab_distilled_question',
+  'ab_context_side',
+  'ab_user_choice',
+  'ab_rating_1to5',
+  'ab_completed_at',
 ];
 
 const SENSITIVE_PATTERNS = [
@@ -90,6 +96,17 @@ function validatePayload_(payload) {
     }
     if (!payload.current_stage) throw new Error('current_stage is required.');
     if (payload.consent_required !== true) throw new Error('Required consent is missing.');
+  }
+  if (payload.action === 'interview') {
+    if (!payload.email_normalized || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email_normalized)) {
+      throw new Error('Valid email is required.');
+    }
+    if (!payload.current_stage) throw new Error('current_stage is required.');
+    if (payload.consent_required !== true) throw new Error('Required consent is missing.');
+    if (payload.interview_transcript &&
+        SENSITIVE_PATTERNS.some((pattern) => pattern.test(payload.interview_transcript))) {
+      throw new Error('Sensitive content is not allowed in transcript.');
+    }
   }
   if (payload.recent_stuck_moment && SENSITIVE_PATTERNS.some((pattern) => pattern.test(payload.recent_stuck_moment))) {
     throw new Error('Sensitive code, URL, token, or log-like input is not allowed.');
@@ -195,4 +212,24 @@ function json_(object) {
   return ContentService
     .createTextOutput(JSON.stringify(object))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function test_interview_doPost_() {
+  const e = { postData: { contents: JSON.stringify({
+    action: 'interview',
+    lead_id: 'test-interview-1',
+    email_normalized: 'tester@example.com',
+    current_stage: 'job_seeker',
+    consent_required: true,
+    interview_transcript: '[{"role":"assistant","text":"무엇이 막혔나요?"},{"role":"user","text":"JPA N+1"}]',
+    interview_turns: 1,
+    ab_distilled_question: 'JPA N+1을 어떻게 푸나요?',
+    recent_stuck_moment: 'JPA N+1을 어떻게 푸나요?',
+    ab_context_side: '1',
+    ab_user_choice: '1',
+    ab_rating_1to5: 4,
+    ab_completed_at: '2026-06-24T01:00:00.000Z',
+    last_updated_at: '2026-06-24T01:00:00.000Z',
+  }) } };
+  Logger.log(doPost(e).getContent());
 }

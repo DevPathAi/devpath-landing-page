@@ -1,4 +1,4 @@
-export const CONSENT_VERSION = '2026-06-24-smoke-v1';
+export const CONSENT_VERSION = '2026-06-24-aiqa-v1';
 
 export const SUBMISSION_STATES = Object.freeze({
   idle: 'idle',
@@ -105,7 +105,6 @@ export function buildStep2Payload(data, context = {}) {
     stack: String(data.stack || '').trim(),
     recent_stuck_moment: String(data.recent_stuck_moment || '').trim(),
     wtp_krw: data.wtp_krw === '' || data.wtp_krw == null ? '' : Number(data.wtp_krw),
-    interview_opt_in: Boolean(data.interview_opt_in),
     step2_submitted_at: now,
     last_updated_at: now,
   };
@@ -120,7 +119,57 @@ export function createSafeDraft(data) {
     stack: data.stack || '',
     recent_stuck_moment: detectSensitiveInput(recentStuckMoment).length > 0 ? '' : recentStuckMoment,
     wtp_krw: data.wtp_krw || '',
-    interview_opt_in: Boolean(data.interview_opt_in),
+  };
+}
+
+export function pickBlindOrder(seed) {
+  const contextFirst = (Math.abs(Math.trunc(Number(seed) || 0)) % 2) === 0;
+  return {
+    contextSide: contextFirst ? 1 : 2,
+    order: contextFirst ? ['context', 'generic'] : ['generic', 'context'],
+  };
+}
+
+export function sanitizeTranscript(transcript) {
+  if (!Array.isArray(transcript)) return [];
+  const out = [];
+  for (const entry of transcript) {
+    const role = entry && entry.role;
+    if (role !== 'user' && role !== 'assistant') continue;
+    const text = String((entry && entry.text) || '');
+    out.push({ role, text: role === 'user' && detectSensitiveInput(text).length > 0 ? '' : text });
+  }
+  return out;
+}
+
+export function buildInterviewPayload(data, transcript, ab = {}, context = {}) {
+  const now = context.now || new Date().toISOString();
+  const safe = sanitizeTranscript(transcript);
+  const distilled = String(ab.distilledQuestion || '').trim();
+  return {
+    action: 'interview',
+    lead_id: data.lead_id,
+    email_normalized: normalizeEmail(data.email),
+    current_stage: data.current_stage || '',
+    consent_required: Boolean(data.consent_required),
+    consent_version: context.consentVersion || CONSENT_VERSION,
+    consent_accepted_at: now,
+    interview_transcript: JSON.stringify(safe),
+    interview_turns: safe.filter((t) => t.role === 'user').length,
+    recent_stuck_moment: distilled,
+    ab_distilled_question: distilled,
+    ab_context_side: ab.contextSide == null ? '' : String(ab.contextSide),
+    ab_user_choice: ab.userChoice == null ? '' : String(ab.userChoice),
+    ab_rating_1to5: ab.rating == null || ab.rating === '' ? '' : Number(ab.rating),
+    ab_completed_at: now,
+    step1_submitted_at: now,
+    last_updated_at: now,
+    utm_source: context.utm_source || '',
+    utm_medium: context.utm_medium || '',
+    utm_campaign: context.utm_campaign || '',
+    utm_content: context.utm_content || '',
+    referrer: context.referrer || '',
+    landing_variant: context.landingVariant || 'aiqa-v1',
   };
 }
 
