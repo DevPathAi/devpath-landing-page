@@ -195,3 +195,20 @@ test('buildInterviewPayload leaves rating/side blank when not provided', () => {
   assert.equal(payload.ab_user_choice, '');
   assert.equal(payload.landing_variant, 'aiqa-v1');
 });
+
+test('sanitizeTranscript drops entries with unknown or missing role', () => {
+  assert.deepEqual(sanitizeTranscript([
+    { role: 'user', text: '막힘' },
+    { role: undefined, text: '누가 말했는지 모름' },
+    { role: 'system', text: 'x' },
+    { role: 'assistant', text: '질문' },
+  ]), [
+    { role: 'user', text: '막힘' },
+    { role: 'assistant', text: '질문' },
+  ]);
+});
+
+test('pickBlindOrder handles negative seeds via absolute value', () => {
+  assert.equal(pickBlindOrder(-1).contextSide, 2);
+  assert.equal(pickBlindOrder(-2).contextSide, 1);
+});

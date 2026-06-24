@@ -134,14 +134,14 @@ export function pickBlindOrder(seed) {
 
 export function sanitizeTranscript(transcript) {
   if (!Array.isArray(transcript)) return [];
-  return transcript.map((entry) => {
-    const role = entry && entry.role === 'user' ? 'user' : 'assistant';
+  const out = [];
+  for (const entry of transcript) {
+    const role = entry && entry.role;
+    if (role !== 'user' && role !== 'assistant') continue;
     const text = String((entry && entry.text) || '');
-    if (role === 'user' && detectSensitiveInput(text).length > 0) {
-      return { role, text: '' };
-    }
-    return { role, text };
-  });
+    out.push({ role, text: role === 'user' && detectSensitiveInput(text).length > 0 ? '' : text });
+  }
+  return out;
 }
 
 export function buildInterviewPayload(data, transcript, ab = {}, context = {}) {
