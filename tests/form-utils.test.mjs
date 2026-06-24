@@ -1,0 +1,138 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import {
+  buildStep1Payload,
+  buildStep2Payload,
+  createSafeDraft,
+  detectSensitiveInput,
+  isValidEmail,
+  mergeRows,
+  normalizeEmail,
+  parseAttribution,
+  validateStep1,
+  validateStep2,
+} from '../src/form-utils.js';
+
+test('normalizes and validates email addresses', () => {
+  assert.equal(normalizeEmail('  User@Example.COM '), 'user@example.com');
+  assert.equal(isValidEmail('user@example.com'), true);
+  assert.equal(isValidEmail('not-an-email'), false);
+});
+
+test('captures UTM attribution and referrer', () => {
+  const attribution = parseAttribution('https://devpath.ai/?utm_source=github&utm_medium=readme&utm_campaign=smoke&utm_content=top', 'https://github.com/DevPathAi');
+  assert.deepEqual(attribution, {
+    utm_source: 'github',
+    utm_medium: 'readme',
+    utm_campaign: 'smoke',
+    utm_content: 'top',
+    referrer: 'https://github.com/DevPathAi',
+  });
+});
+
+test('validates Step 1 required fields', () => {
+  assert.deepEqual(validateStep1({
+    email: 'learner@example.com',
+    current_stage: 'job_seeker',
+    consent_required: true,
+  }), []);
+
+  assert.equal(validateStep1({
+    email: 'bad',
+    current_stage: '',
+    consent_required: false,
+  }).length, 3);
+});
+
+test('builds Step 1 payload with consent version and attribution', () => {
+  const payload = buildStep1Payload({
+    lead_id: 'lead-1',
+    email: ' USER@EXAMPLE.COM ',
+    current_stage: 'junior_dev',
+    consent_required: true,
+  }, {
+    now: '2026-06-24T00:00:00.000Z',
+    consentVersion: 'v-test',
+    landingVariant: 'variant-a',
+    utm_source: 'github',
+  });
+
+  assert.equal(payload.email_normalized, 'user@example.com');
+  assert.equal(payload.consent_version, 'v-test');
+  assert.equal(payload.utm_source, 'github');
+  assert.equal(payload.landing_variant, 'variant-a');
+});
+
+test('detects sensitive input in recent stuck moment', () => {
+  assert.deepEqual(detectSensitiveInput('JPA N+1에서 어디부터 봐야 할지 모르겠습니다.'), []);
+  assert.ok(detectSensitiveInput('https://github.com/acme/private-repo').includes('GitHub URL'));
+  assert.ok(detectSensitiveInput('password=secret').includes('password'));
+  assert.ok(detectSensitiveInput('-----BEGIN PRIVATE KEY-----').includes('private key'));
+});
+
+test('validates Step 2 sensitive input and negative WTP', () => {
+  assert.deepEqual(validateStep2({
+    recent_stuck_moment: 'LazyInitializationException 원인을 어디서 봐야 할지 모르겠습니다.',
+    wtp_krw: 15000,
+  }), []);
+
+  const errors = validateStep2({
+    recent_stuck_moment: 'token: abc123',
+    wtp_krw: -1000,
+  });
+  assert.equal(errors.length, 2);
+});
+
+test('builds Step 2 payload without erasing optional blanks', () => {
+  const payload = buildStep2Payload({
+    lead_id: 'lead-1',
+    email: 'user@example.com',
+    stack: 'Java, Spring, JPA',
+    recent_stuck_moment: 'N+1 문제를 보고 있는데 fetch join 기준이 헷갈립니다.',
+    wtp_krw: '',
+    interview_opt_in: true,
+  }, {
+    now: '2026-06-24T00:05:00.000Z',
+  });
+
+  assert.equal(payload.wtp_krw, '');
+  assert.equal(payload.interview_opt_in, true);
+  assert.equal(payload.step2_submitted_at, '2026-06-24T00:05:00.000Z');
+});
+
+test('mergeRows keeps prior values when incoming values are empty', () => {
+  assert.deepEqual(mergeRows({
+    lead_id: 'lead-1',
+    email_normalized: 'user@example.com',
+    stack: 'Java',
+  }, {
+    stack: '',
+    recent_stuck_moment: 'JPA transaction boundary가 헷갈립니다.',
+  }), {
+    lead_id: 'lead-1',
+    email_normalized: 'user@example.com',
+    stack: 'Java',
+    recent_stuck_moment: 'JPA transaction boundary가 헷갈립니다.',
+  });
+});
+
+test('createSafeDraft omits sensitive recent stuck moment from localStorage drafts', () => {
+  assert.deepEqual(createSafeDraft({
+    email: 'learner@example.com',
+    current_stage: 'job_seeker',
+    consent_required: true,
+    stack: 'Spring',
+    recent_stuck_moment: 'https://github.com/acme/private-repo 에러입니다',
+    wtp_krw: '15000',
+    interview_opt_in: true,
+  }), {
+    email: 'learner@example.com',
+    current_stage: 'job_seeker',
+    consent_required: true,
+    stack: 'Spring',
+    recent_stuck_moment: '',
+    wtp_krw: '15000',
+    interview_opt_in: true,
+  });
+});

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DevPath AI — 주니어 개발자 학습 진단</title>
+    <meta
+      name="description"
+      content="Java/Spring 백엔드 학습자와 주니어 개발자를 위한 30분 학습 진단 인터뷰를 모집합니다."
+    >
+    <meta property="og:title" content="DevPath AI 학습 진단">
+    <meta
+      property="og:description"
+      content="최근 막혔던 개발 학습 순간을 바탕으로 다음 2주 학습 방향과 AI 답변 차이를 검증합니다."
+    >
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    >
+    <link rel="stylesheet" href="styles.css">
+    <script>
+      window.DEVPATH_FORM_ENDPOINT = '';
+      window.DEVPATH_CONSENT_VERSION = '2026-06-24-smoke-v1';
+      window.DEVPATH_LANDING_VARIANT = 'smoke-test-v1';
+    </script>
+    <!-- file:// 에서도 동작하도록 비-module 번들 사용 (npm run build 로 생성). -->
+    <script src="src/app.bundle.js" defer></script>
+  </head>
+  <body>
+    <!-- ── Navigation ── -->
+    <nav class="nav" aria-label="메인 네비게이션">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">
+          <span class="nav-logo-icon">&gt;_</span> DevPath AI
+        </a>
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#hero">진단 소개</a></li>
+          <li><a href="#how-it-works">진행 방식</a></li>
+          <li><a href="#apply">신청하기</a></li>
+          <li><a href="#faq">자주 묻는 질문</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="shell">
+      <!-- ── Hero Terminal ── -->
+      <section class="terminal" aria-labelledby="hero-title" id="hero">
+        <div class="term-bar">
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span class="term-file">~/devpath/learning-diagnosis</span>
+          <span class="term-tag">사전 검증</span>
+        </div>
+        <div class="term-body">
+          <p class="prompt-line"><span class="sigil">$</span> <span class="cmd">devpath</span> interview --stack java,spring --duration 30m<span class="cur"></span></p>
+          <p class="eyebrow">DevPath AI 사전 검증</p>
+          <h1 id="hero-title">최근 막혔던 <span class="hl">Java/Spring</span> 학습 순간을 30분만 들려주세요</h1>
+          <p class="lede">지금 단계와 실제로 막혔던 장면을 바탕으로, 다음 2주 학습 방향과 맥락을 아는 AI 답변이 정말 더 도움이 되는지 함께 확인합니다.</p>
+          <div class="chips">
+            <span class="chip"><b>online</b> 온라인 30분</span>
+            <span class="chip"><b>target</b> 주니어&middot;취준 우선</span>
+            <span class="chip"><b>reward</b> 소정의 사례비</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Timeline / How It Works ── -->
+      <section class="timeline-section scroll-fade" id="how-it-works" aria-labelledby="timeline-title">
+        <p class="section-eyebrow">진행 방식</p>
+        <h2 class="section-title" id="timeline-title">3단계로 진행됩니다</h2>
+        <div class="timeline">
+          <div class="tl-item scroll-fade">
+            <div class="tl-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            </div>
+            <div class="tl-content">
+              <span class="tl-step">STEP 01</span>
+              <h3>간단한 신청서 작성</h3>
+              <p>이메일, 현재 학습 단계, 막혔던 순간을 간단히 적어주세요. 2분이면 충분합니다.</p>
+            </div>
+          </div>
+          <div class="tl-connector" aria-hidden="true"></div>
+          <div class="tl-item scroll-fade">
+            <div class="tl-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="tl-content">
+              <span class="tl-step">STEP 02</span>
+              <h3>30분 온라인 인터뷰</h3>
+              <p>화상 통화로 학습 과정과 막힌 지점을 이야기해 주세요. 준비할 것은 없습니다.</p>
+            </div>
+          </div>
+          <div class="tl-connector" aria-hidden="true"></div>
+          <div class="tl-item scroll-fade">
+            <div class="tl-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="tl-content">
+              <span class="tl-step">STEP 03</span>
+              <h3>베타 우선 초대</h3>
+              <p>인터뷰 결과를 바탕으로 학습 맥락을 반영한 AI 답변을 미리 체험할 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Form Panel ── -->
+      <section class="panel scroll-fade" aria-labelledby="form-title" id="apply">
+        <div class="panel-head">
+          <h2 id="form-title">학습 진단 인터뷰 신청</h2>
+          <p>먼저 이메일과 현재 단계를 저장합니다. 이후 한 가지 질문만 더 답하면 인터뷰 우선순위를 정하는 데 도움이 됩니다.</p>
+          <p class="meta">step 1 &rarr; 대기자 등록<br>step 2 &rarr; 인터뷰 우선순위</p>
+        </div>
+
+        <div class="console">
+          <form id="lead-form" class="lead-form" novalidate>
+            <input type="hidden" name="lead_id" id="lead-id">
+
+            <!-- Progress bar -->
+            <div class="progress-bar" aria-hidden="true">
+              <div class="progress-fill" id="progress-fill" style="width:50%"></div>
+            </div>
+            <div class="progress-labels" id="progress-labels">
+              <span class="active">STEP 1</span>
+              <span>STEP 2</span>
+              <span class="done-label" hidden>&check; 완료</span>
+            </div>
+
+            <div class="step" data-step="1">
+              <span class="step-tag">STEP 1 / 2 &mdash; 대기자 등록</span>
+              <div class="field">
+                <label for="email">이메일 <span class="key">email</span> <span class="req">*</span></label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+              </div>
+              <div class="field">
+                <label for="current-stage">현재 단계 <span class="key">stage</span> <span class="req">*</span></label>
+                <select id="current-stage" name="current_stage" required>
+                  <option value="">선택해주세요</option>
+                  <option value="job_seeker">취업 준비생</option>
+                  <option value="junior_dev">주니어 현직자</option>
+                  <option value="self_taught">비전공 독학자</option>
+                  <option value="other">기타</option>
+                </select>
+              </div>
+              <label class="check" for="consent-required">
+                <input id="consent-required" name="consent_required" type="checkbox" required>
+                <span>출시 알림&middot;인터뷰 안내를 위해 이메일과 현재 단계를 수집합니다. 보유 기간은 정식 출시 후 6개월 또는 동의 철회 시까지입니다. 문의&middot;철회: <a href="mailto:privacy@devpath.ai">privacy@devpath.ai</a></span>
+              </label>
+              <button class="btn" type="button" id="save-step1">대기자 등록하고 한 가지 더 답하기</button>
+            </div>
+
+            <div class="step step-two" data-step="2" hidden>
+              <span class="step-tag">STEP 2 / 2 &mdash; 인터뷰 우선순위 (선택)</span>
+              <div class="field">
+                <label for="stack">주로 공부 중인 스택 <span class="key">stack</span></label>
+                <input id="stack" name="stack" type="text" placeholder="예: Java, Spring, JPA">
+              </div>
+              <div class="field">
+                <label for="recent-stuck-moment">최근 가장 막혔던 순간 <span class="key">stuck</span></label>
+                <textarea id="recent-stuck-moment" name="recent_stuck_moment" rows="4" maxlength="320" placeholder="코드&middot;로그&middot;URL 없이 상황만 1~2문장으로 적어주세요."></textarea>
+                <p class="help">// 전체 에러 로그, GitHub URL, 회사 코드, API 키, 토큰, DB URL은 붙여넣지 마세요.</p>
+              </div>
+              <div class="field">
+                <label for="wtp-krw">망설임 없이 결제할 월 가격 (선택) <span class="key">wtp/mo</span></label>
+                <input id="wtp-krw" name="wtp_krw" type="number" min="0" step="1000" inputmode="numeric" placeholder="예: 15000">
+              </div>
+              <label class="check" for="interview-opt-in">
+                <input id="interview-opt-in" name="interview_opt_in" type="checkbox">
+                <span>30분 온라인 인터뷰 참여 의향이 있습니다. 소정의 사례비를 안내드립니다.</span>
+              </label>
+              <button class="btn" type="submit" id="save-step2">인터뷰 신청 정보 저장</button>
+            </div>
+
+            <div id="form-status" class="status" role="status" aria-live="polite"></div>
+          </form>
+
+          <!-- Thank-you screen -->
+          <div class="thankyou" id="thankyou" hidden>
+            <div class="thankyou-check" id="thankyou-check">
+              <svg class="checkmark-svg" viewBox="0 0 52 52" aria-hidden="true">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+            <h2 class="thankyou-title">신청이 완료되었습니다!</h2>
+            <p class="thankyou-text">인터뷰 대상자로 선정되면 이메일로 연락드리겠습니다.<br>평균 3영업일 이내에 안내 메일이 발송됩니다.</p>
+            <div class="thankyou-meta">
+              <span class="chip"><b>status</b> 대기자 등록 완료</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Evidence Cards ── -->
+      <section class="evidence scroll-fade" aria-label="검증 방식">
+        <article class="ev"><h3>제품 설명보다 실제 장면</h3><p>최근 막혔던 문제 해결 과정을 듣고, ChatGPT에 매번 다시 설명하던 맥락이 있었는지 봅니다.</p></article>
+        <article class="ev"><h3>두 답변 비교</h3><p>일반 답변과 학습 맥락을 반영한 답변을 비교해 정말 더 유용한지 1~5점으로 확인합니다.</p></article>
+        <article class="ev"><h3>베타 후보 선별</h3><p>Java/Spring 학습 맥락이 구체적인 분들을 우선 초대해 100인 베타 풀로 연결합니다.</p></article>
+      </section>
+
+      <!-- ── FAQ ── -->
+      <section class="faq-section scroll-fade" id="faq" aria-labelledby="faq-title">
+        <p class="section-eyebrow">자주 묻는 질문</p>
+        <h2 class="section-title" id="faq-title">궁금한 점이 있으신가요?</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary class="faq-q">
+              <span>인터뷰는 어떻게 진행되나요?</span>
+              <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-a">
+              <p>Zoom 또는 Google Meet로 30분간 진행됩니다. 미리 준비하실 자료는 없고, 본인이 겪은 학습 경험과 막혔던 순간을 자유롭게 이야기해 주시면 됩니다. 녹화는 선택 사항이며, 동의하신 경우에만 후속 분석에 활용됩니다.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-q">
+              <span>사례비는 얼마인가요?</span>
+              <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-a">
+              <p>인터뷰 참여에 대해 소정의 사례비를 지급해 드립니다. 정확한 금액은 인터뷰 확정 시 이메일로 안내드립니다.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-q">
+              <span>Java/Spring을 잘 모르면 참여할 수 있나요?</span>
+              <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-a">
+              <p>네, 가능합니다. 현재 Java나 Spring을 공부 중이거나 관심이 있는 분이면 누구나 지원 가능합니다. 초보자의 생생한 학습 경험이 오히려 더 큰 도움이 됩니다.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-q">
+              <span>수집한 개인정보는 어떻게 관리되나요?</span>
+              <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-a">
+              <p>이메일과 학습 단계 정보는 정식 서비스 출시 후 6개월 또는 동의 철회 시까지 보관 후 삭제됩니다. 인터뷰 내용은 익명화하여 분석에만 사용됩니다. 언제든 <a href="mailto:privacy@devpath.ai">privacy@devpath.ai</a>로 문의 및 철회가 가능합니다.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-q">
+              <span>베타 테스트는 언제 시작되나요?</span>
+              <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <div class="faq-a">
+              <p>사전 검증 인터뷰를 바탕으로 제품을 개선한 뒤, 2026년 하반기 중 베타 테스트를 예정하고 있습니다. 인터뷰 참여자분들을 우선 초대할 예정이니 신청서를 남겨주시면 됩니다.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <span class="footer-logo"><span class="nav-logo-icon">&gt;_</span> DevPath AI</span>
+        <span class="footer-copy">&copy; 2026 DevPath AI. All rights reserved.</span>
+        <a href="mailto:privacy@devpath.ai" class="footer-link">개인정보 문의</a>
+      </div>
+    </footer>
+
+    <!-- ── Particle Canvas ── -->
+    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  </body>
+</html>
