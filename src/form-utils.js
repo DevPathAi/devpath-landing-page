@@ -124,6 +124,18 @@ export function createSafeDraft(data) {
   };
 }
 
+export function pickBlindOrder(seed) {
+  const contextFirst = (Math.abs(Math.trunc(Number(seed) || 0)) % 2) === 0;
+  return {
+    contextSide: contextFirst ? 1 : 2,
+    order: contextFirst ? ['context', 'generic'] : ['generic', 'context'],
+  };
+}
+
+// Task 2 stubs — replaced with full implementations in Task 2
+export function sanitizeTranscript(_transcript) { return []; }
+export function buildInterviewPayload(_data, _transcript, _ab, _context) { return {}; }
+
 export function mergeRows(existing, incoming) {
   const merged = { ...existing };
   for (const [key, value] of Object.entries(incoming)) {

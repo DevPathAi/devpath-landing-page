@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  buildInterviewPayload,
   buildStep1Payload,
   buildStep2Payload,
   createSafeDraft,
@@ -10,6 +11,8 @@ import {
   mergeRows,
   normalizeEmail,
   parseAttribution,
+  pickBlindOrder,
+  sanitizeTranscript,
   validateStep1,
   validateStep2,
 } from '../src/form-utils.js';
@@ -135,4 +138,11 @@ test('createSafeDraft omits sensitive recent stuck moment from localStorage draf
     wtp_krw: '15000',
     interview_opt_in: true,
   });
+});
+
+test('pickBlindOrder maps even/odd seed to deterministic blind order', () => {
+  assert.deepEqual(pickBlindOrder(0), { contextSide: 1, order: ['context', 'generic'] });
+  assert.deepEqual(pickBlindOrder(1), { contextSide: 2, order: ['generic', 'context'] });
+  assert.deepEqual(pickBlindOrder(2), { contextSide: 1, order: ['context', 'generic'] });
+  assert.equal(pickBlindOrder(undefined).contextSide, 1);
 });
