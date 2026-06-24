@@ -680,6 +680,35 @@ textarea { resize: vertical; min-height: 92px; }
 .ev h3::before { content: "# "; font-family: var(--mono); color: var(--green); }
 .ev p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
 
+/* ── Before/After demo ── */
+.ba { margin-top: 40px; }
+.ba-q { font-family: var(--mono); font-size: 14px; color: var(--ink); margin: 0 0 16px; overflow-wrap: anywhere; }
+.ba-q-tag { color: var(--green); }
+.ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ba-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 18px 20px;
+}
+.ba-card-ctx { border-color: rgba(57, 197, 207, 0.45); box-shadow: 0 0 28px -14px rgba(57, 197, 207, 0.35); }
+.ba-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+}
+.ba-tag-ctx { color: var(--cyan); border-color: rgba(57, 197, 207, 0.5); }
+.ba-card p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+.ba-card-ctx p { color: var(--ink); }
+.ba-card code { background: rgba(255, 255, 255, 0.08); padding: 1px 5px; border-radius: 4px; font-family: var(--mono); font-size: 0.85em; }
+.ba-note { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 14px 0 0; }
+@media (max-width: 720px) { .ba-grid { grid-template-columns: 1fr; } }
+
 /* ── FAQ ── */
 .faq-section {
   margin-top: 72px;
