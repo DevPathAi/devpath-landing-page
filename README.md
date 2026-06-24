@@ -12,6 +12,25 @@ This repo intentionally starts smaller than the long-term Jaspr landing plan. It
 - Data quality: Step 1 insert, Step 2 upsert, duplicate-submit protection.
 - Privacy: blocks obvious source code, stack traces, GitHub URLs, tokens, DB URLs, and long logs.
 
+## Round 1 Pass Criteria
+
+Set these thresholds **before** launch and judge pass/fail against them — fixing
+the bar up front is what keeps the smoke test from becoming a post-hoc
+rationalization. Evidence lands in the `report_lcs_evidence` and
+`report_beta_candidates` sheets.
+
+**LCS value** — does learning context make answers more useful? Measured by the
+end-of-interview blind A/B (context-aware vs generic answer, rated 1–5):
+
+- the context-aware answer is preferred by **≥ 60%** of raters (n ≥ 15), and
+- its mean rating beats the generic answer by **≥ +0.5**.
+
+**Demand** — **≥ 20** completed leads (finished interview + email).
+
+Both LCS conditions **and** the demand condition met → proceed to Round 2.
+Otherwise the signal is inconclusive: revise the hypothesis or the funnel rather
+than scaling.
+
 ## Files
 
 - `index.html` — static smoke-test page.
