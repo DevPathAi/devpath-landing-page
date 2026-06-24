@@ -33,6 +33,18 @@ export function distillSystem() {
   return '아래 인터뷰 전사를 읽고, 학습자가 막힌 핵심 질문을 한국어 한 문장으로만 출력해라. 따옴표 없이.';
 }
 
+// The distill model can return empty text. Sending an empty user message to the
+// Messages API fails with 400 "user messages must have non-empty content", which
+// surfaced as stream_error_400. Always resolve to a non-empty question: fall back
+// to the learner's last message, then to a generic ask.
+export function resolveDistilledQuestion(distillText, transcript) {
+  const q = String(distillText || '').trim();
+  if (q) return q;
+  const list = Array.isArray(transcript) ? transcript : [];
+  const lastUser = [...list].reverse().find((m) => m && m.role === 'user');
+  return lastUser && lastUser.text ? String(lastUser.text).slice(0, 300) : '제 상황에 맞는 학습 조언을 해주세요.';
+}
+
 export function genericAnswerSystem() {
   return '너는 Java/Spring 학습 도우미다. 주어진 질문에 일반적인 답을 한국어로 간결히 제시해라. 학습자 개인 맥락은 모른다.';
 }
