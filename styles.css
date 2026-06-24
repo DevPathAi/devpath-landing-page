@@ -864,6 +864,7 @@ textarea { resize: vertical; min-height: 92px; }
 .iv-input textarea { flex: 1; min-height: 56px; resize: vertical; }
 .iv-input .btn { width: auto; flex: 0 0 auto; align-self: flex-start; }
 .iv-status[data-tone="error"] { color: #ff8a8a; }
+.iv-notice { font-size: 12px; color: var(--muted); margin: 2px 0 0; line-height: 1.55; }
 .iv-gate, .iv-rate { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .iv-consent { display: flex; gap: 8px; font-size: 0.85rem; align-items: flex-start; }
 .iv-ab { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }

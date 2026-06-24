@@ -117,7 +117,17 @@ export function initInterview(root, { config }) {
   function startInterview() {
     const opener = '최근 Java/Spring을 공부하다 가장 막혔던 순간은 무엇이었나요?';
     addBubble('assistant', opener); history.push({ role: 'assistant', text: opener });
+    // P0: 첫 입력 전 처리 안내 + 전송 동의(이메일 저장 동의와 분리). 동의 전에는 전송 불가.
+    const notice = el('p', 'iv-notice', '코드·로그·URL·비밀값은 입력하지 마세요. 입력 내용은 AI 질문 생성을 위해 서버로 전송·처리됩니다.');
+    const consentLabel = el('label', 'iv-consent');
+    const consentCb = el('input'); consentCb.type = 'checkbox';
+    consentLabel.append(consentCb, el('span', null, 'AI 인터뷰 처리를 위해 입력 내용을 전송하는 데 동의합니다.'));
+    root.append(notice, consentLabel);
     const wrap = renderInput(async (v, w) => {
+      if (detectSensitiveInput(v).length > 0) {
+        setStatus('보안을 위해 URL·코드·로그·비밀값은 받을 수 없어요. 상황만 한두 문장으로 다시 적어주세요.', 'error');
+        return;
+      }
       const bubble = addBubble('user', v);
       history.push({ role: 'user', text: v });
       w.querySelector('textarea').value = '';
@@ -128,6 +138,8 @@ export function initInterview(root, { config }) {
         w.querySelector('textarea').value = v;
       }
     });
+    wrap.setEnabled(false);
+    consentCb.addEventListener('change', () => { wrap.setEnabled(consentCb.checked); });
     return wrap;
   }
 
@@ -140,7 +152,7 @@ export function initInterview(root, { config }) {
       .forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; stageSel.append(o); });
     const consentLabel = el('label', 'iv-consent');
     const consent = el('input'); consent.type = 'checkbox'; consent.required = true;
-    consentLabel.append(consent, el('span', null, '이메일·학습 단계와 인터뷰 전사를 출시 알림·분석 목적으로 저장하고 AI 처리에 사용하는 데 동의합니다. 보유 기간은 정식 출시 후 6개월 또는 동의 철회 시까지입니다.'));
+    consentLabel.append(consent, el('span', null, '이메일·학습 단계와 인터뷰 전사를 출시 알림·분석 목적으로 저장하는 데 동의합니다. 보유 기간은 정식 출시 후 6개월 또는 동의 철회 시까지입니다.'));
     const btn = el('button', 'btn', '결과 보기'); btn.type = 'submit';
     form.append(emailInput, stageSel, consentLabel, btn);
     root.append(form);
