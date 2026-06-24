@@ -334,11 +334,11 @@ function initInterview(root, { config }) {
   }
 
   async function nextTurn(inputWrap) {
-    setStatus('생각 중...');
+    const userTurns = history.filter((m) => m && m.role === 'user').length;
+    setStatus(`질문 ${Math.min(userTurns, 5)}/5 · 생각 중... (보통 5~10초)`);
     if (inputWrap) inputWrap.setEnabled(false);
     try {
       // Backend gates Turnstile only on the first /turn; mint a fresh single-use token then.
-      const userTurns = history.filter((m) => m && m.role === 'user').length;
       const turnstileToken = userTurns <= 1 ? await config.turnstileToken() : '';
       const { question, done } = await client.sendTurn({ history, turnstileToken });
       setStatus('');
@@ -405,7 +405,7 @@ function initInterview(root, { config }) {
   }
 
   async function runCompare() {
-    setStatus('두 가지 답변을 생성하고 있습니다...');
+    setStatus('두 답변을 생성하고 있습니다… (약 10~20초)');
     root.querySelectorAll('.iv-ab, .iv-retry').forEach((n) => n.remove());
     answers = { context: '', generic: '' };
     blind = pickBlindOrder(Math.floor(Math.random() * 2));
@@ -438,7 +438,15 @@ function initInterview(root, { config }) {
       card.append(el('h4', null, `답변 ${i + 1}`));
       const body = el('div', 'iv-card-body'); card.append(body);
       const pick = el('button', 'btn btn-ghost', '이 답변이 더 유용해요'); pick.type = 'button';
-      pick.addEventListener('click', () => { userChoice = i + 1; grid.querySelectorAll('.iv-card').forEach((c) => c.classList.remove('chosen')); card.classList.add('chosen'); });
+      pick.setAttribute('aria-label', `답변 ${i + 1}이 더 유용함 선택`);
+      pick.addEventListener('click', () => {
+        userChoice = i + 1;
+        grid.querySelectorAll('.iv-card').forEach((c) => c.classList.remove('chosen'));
+        grid.querySelectorAll('.iv-card .btn-ghost').forEach((b) => { b.textContent = '이 답변이 더 유용해요'; b.setAttribute('aria-pressed', 'false'); });
+        card.classList.add('chosen');
+        pick.textContent = '✓ 선택됨';
+        pick.setAttribute('aria-pressed', 'true');
+      });
       card.append(pick);
       grid.append(card); slots[which] = body;
     });
