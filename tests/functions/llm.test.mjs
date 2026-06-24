@@ -25,7 +25,7 @@ test('callClaude posts to messages API and extracts text', async () => {
 });
 
 test('callClaude throws on non-ok', async () => {
-  const fetchImpl = async () => ({ ok: false, status: 429, json: async () => ({}) });
+  const fetchImpl = async () => ({ ok: false, status: 429, text: async () => 'rate limited', json: async () => ({}) });
   await assert.rejects(() => callClaude({ apiKey: 'k', model: MODEL_TURN, system: 's', messages: [], fetchImpl }), /429/);
 });
 
