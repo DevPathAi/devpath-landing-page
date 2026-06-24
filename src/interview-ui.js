@@ -1,3 +1,59 @@
+// Minimal, XSS-safe markdown renderer: builds DOM via textContent only (never innerHTML).
+// Supports headers, bold, inline code, fenced code blocks, unordered/ordered lists, hr.
+function mdInline(parent, text) {
+  const re = /\*\*([^*]+)\*\*|`([^`]+)`/g;
+  let last = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
+    if (m[1] !== undefined) { const s = document.createElement('strong'); s.textContent = m[1]; parent.appendChild(s); }
+    else { const c = document.createElement('code'); c.textContent = m[2]; parent.appendChild(c); }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
+}
+
+function renderMarkdownInto(container, md) {
+  container.textContent = '';
+  const lines = String(md || '').split('\n');
+  let i = 0, list = null;
+  const flush = () => { if (list) { container.appendChild(list); list = null; } };
+  const special = (l) => /^```/.test(l) || /^#{1,6}\s/.test(l) || /^\s*[-*]\s/.test(l) || /^\s*\d+\.\s/.test(l) || /^---+\s*$/.test(l) || /^\s*$/.test(l);
+  while (i < lines.length) {
+    const line = lines[i];
+    let m;
+    if (/^```/.test(line)) {
+      flush(); i++;
+      const code = [];
+      while (i < lines.length && !/^```\s*$/.test(lines[i])) { code.push(lines[i]); i++; }
+      i++;
+      const pre = document.createElement('pre'); const c = document.createElement('code');
+      c.textContent = code.join('\n'); pre.appendChild(c); container.appendChild(pre);
+      continue;
+    }
+    if ((m = line.match(/^(#{1,6})\s+(.*)$/))) {
+      flush();
+      const lvl = Math.min(6, m[1].length + 3);
+      const h = document.createElement('h' + lvl); mdInline(h, m[2]); container.appendChild(h);
+      i++; continue;
+    }
+    if (/^---+\s*$/.test(line)) { flush(); container.appendChild(document.createElement('hr')); i++; continue; }
+    if ((m = line.match(/^\s*[-*]\s+(.*)$/))) {
+      if (!list || list.tagName !== 'UL') { flush(); list = document.createElement('ul'); }
+      const li = document.createElement('li'); mdInline(li, m[1]); list.appendChild(li); i++; continue;
+    }
+    if ((m = line.match(/^\s*(\d+)\.\s+(.*)$/))) {
+      if (!list || list.tagName !== 'OL') { flush(); list = document.createElement('ol'); }
+      const li = document.createElement('li'); mdInline(li, m[2]); list.appendChild(li); i++; continue;
+    }
+    if (/^\s*$/.test(line)) { flush(); i++; continue; }
+    flush();
+    const para = [line]; i++;
+    while (i < lines.length && !special(lines[i])) { para.push(lines[i]); i++; }
+    const p = document.createElement('p'); mdInline(p, para.join(' ')); container.appendChild(p);
+  }
+  flush();
+}
+
 export function initInterview(root, { config }) {
   const client = createInterviewClient({});
   const attribution = parseAttribution(window.location.href, document.referrer);
@@ -16,7 +72,8 @@ export function initInterview(root, { config }) {
   root.append(log, status);
 
   function addBubble(role, text) {
-    const b = el('div', `iv-bubble iv-${role}`, text);
+    const b = el('div', `iv-bubble iv-${role}`);
+    if (role === 'assistant') renderMarkdownInto(b, text); else b.textContent = text;
     log.append(b); log.scrollTop = log.scrollHeight; return b;
   }
   function setStatus(msg, tone) { status.textContent = msg || ''; if (tone) status.dataset.tone = tone; else delete status.dataset.tone; }
@@ -135,7 +192,7 @@ export function initInterview(root, { config }) {
       grid.append(card); slots[which] = body;
     });
     root.append(grid);
-    return { update: (which) => { slots[which].textContent = answers[which]; } };
+    return { update: (which) => { renderMarkdownInto(slots[which], answers[which]); } };
   }
 
   function renderRating() {
