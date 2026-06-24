@@ -26,27 +26,47 @@ export function initInterview(root, { config }) {
     const ta = el('textarea'); ta.maxLength = 600; ta.required = true; ta.placeholder = '코드/로그/URL 없이 상황만 적어주세요';
     const btn = el('button', 'btn', '보내기'); btn.type = 'submit';
     wrap.append(ta, btn);
-    wrap.addEventListener('submit', (e) => { e.preventDefault(); const v = ta.value.trim(); if (!v) return; onSend(v, wrap); });
+    wrap.setEnabled = (on) => { ta.disabled = !on; btn.disabled = !on; };
+    wrap.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (btn.disabled) return;
+      const v = ta.value.trim();
+      if (!v) return;
+      onSend(v, wrap);
+    });
     root.append(wrap); ta.focus(); return wrap;
   }
 
   async function nextTurn(inputWrap) {
     setStatus('생각 중...');
+    if (inputWrap) inputWrap.setEnabled(false);
     try {
       const { question, done } = await client.sendTurn({ history, turnstileToken: config.turnstileToken() });
       setStatus('');
       if (question) { addBubble('assistant', question); history.push({ role: 'assistant', text: question }); }
       if (done) { if (inputWrap) inputWrap.remove(); renderGate(); }
-    } catch (err) { setStatus(`오류: ${err.message}. 다시 시도해주세요.`, 'error'); }
+      else if (inputWrap) { inputWrap.setEnabled(true); inputWrap.querySelector('textarea').focus(); }
+      return true;
+    } catch (err) {
+      setStatus(`오류: ${err.message}. 다시 시도해주세요.`, 'error');
+      if (inputWrap) inputWrap.setEnabled(true);
+      return false;
+    }
   }
 
   function startInterview() {
     const opener = '최근 Java/Spring을 공부하다 가장 막혔던 순간은 무엇이었나요?';
     addBubble('assistant', opener); history.push({ role: 'assistant', text: opener });
     const wrap = renderInput(async (v, w) => {
-      addBubble('user', v); history.push({ role: 'user', text: v });
+      const bubble = addBubble('user', v);
+      history.push({ role: 'user', text: v });
       w.querySelector('textarea').value = '';
-      await nextTurn(w);
+      const ok = await nextTurn(w);
+      if (!ok) {
+        history.pop();
+        bubble.remove();
+        w.querySelector('textarea').value = v;
+      }
     });
     return wrap;
   }
@@ -133,6 +153,7 @@ export function initInterview(root, { config }) {
     if (!config.endpoint) { setStatus('저장 URL이 설정되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error'); return; }
     try {
       const res = await fetch(config.endpoint, { method: 'POST', headers: { 'content-type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error(`저장 서버 오류 (${res.status})`);
       const result = await res.json();
       if (!result.ok) throw new Error(result.error || '저장 실패');
       setStatus('');
@@ -140,7 +161,7 @@ export function initInterview(root, { config }) {
     } catch (err) { setStatus(`저장 오류: ${err.message}`, 'error'); }
   }
 
-  if (!config.turnstileToken || !window.DEVPATH_TURNSTILE_SITEKEY) {
+  if (!window.DEVPATH_TURNSTILE_SITEKEY) {
     setStatus('데모 준비 중입니다(보안 위젯 미설정).', 'error');
     return;
   }

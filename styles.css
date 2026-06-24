@@ -842,4 +842,3 @@ textarea { resize: vertical; min-height: 92px; }
 .iv-card-body { white-space: pre-wrap; line-height: 1.5; font-size: 0.92rem; }
 .iv-done { margin-top: 12px; color: var(--green, #39c5cf); }
 @media (max-width: 640px) { .iv-ab { grid-template-columns: 1fr; } }
-}
