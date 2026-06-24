@@ -41,7 +41,10 @@ export function initInterview(root, { config }) {
     setStatus('생각 중...');
     if (inputWrap) inputWrap.setEnabled(false);
     try {
-      const { question, done } = await client.sendTurn({ history, turnstileToken: config.turnstileToken() });
+      // Backend gates Turnstile only on the first /turn; mint a fresh single-use token then.
+      const userTurns = history.filter((m) => m && m.role === 'user').length;
+      const turnstileToken = userTurns <= 1 ? await config.turnstileToken() : '';
+      const { question, done } = await client.sendTurn({ history, turnstileToken });
       setStatus('');
       if (question) { addBubble('assistant', question); history.push({ role: 'assistant', text: question }); }
       if (done) { if (inputWrap) inputWrap.remove(); renderGate(); }
@@ -95,11 +98,14 @@ export function initInterview(root, { config }) {
 
   async function runCompare() {
     setStatus('두 가지 답변을 생성하고 있습니다...');
+    root.querySelectorAll('.iv-ab, .iv-retry').forEach((n) => n.remove());
+    answers = { context: '', generic: '' };
     blind = pickBlindOrder(Math.floor(Math.random() * 2));
-    const cards = renderAnswerCards();
     try {
+      const turnstileToken = await config.turnstileToken();
+      const cards = renderAnswerCards();
       await client.streamCompare({
-        transcript: history, stage, turnstileToken: config.turnstileToken(),
+        transcript: history, stage, turnstileToken,
         onEvent: (evt) => {
           if (evt.type === 'distilled') { distilled = evt.question || ''; }
           else if (evt.type === 'generic') { answers.generic += evt.delta || ''; cards.update('generic'); }
@@ -108,7 +114,12 @@ export function initInterview(root, { config }) {
           else if (evt.type === 'error') { setStatus('생성 중 오류가 발생했습니다. 다시 시도해주세요.', 'error'); }
         },
       });
-    } catch (err) { setStatus(`오류: ${err.message}`, 'error'); }
+    } catch (err) {
+      setStatus(`오류: ${err.message}`, 'error');
+      const retry = el('button', 'iv-retry btn', '다시 시도'); retry.type = 'button';
+      retry.addEventListener('click', () => runCompare());
+      root.append(retry);
+    }
   }
 
   function renderAnswerCards() {
