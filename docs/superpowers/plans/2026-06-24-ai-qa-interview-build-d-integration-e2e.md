@@ -10,6 +10,10 @@
 
 **Spec:** `docs/superpowers/specs/2026-06-24-ai-qa-interview-design.md` (§10, §11).
 
+## Carry-in from final review (REQUIRED before live deploy)
+
+**X-1 (Important) — Turnstile single-use token reuse on `/compare`.** The frontend currently sends one `window.__turnstileToken` (minted on initial solve) on both the first `/turn` and on `/compare`. Cloudflare Turnstile tokens are single-use (~300s); after `/turn` redeems it, `/compare`'s `siteverify` will reject the duplicate → `/compare` 403 → user never reaches A/B+rating. Spec §8 requires a **fresh token minted at the email gate**. Fix in Build C's files (`src/interview-ui.js` / `index.html`) by re-executing Turnstile at the gate (e.g. `turnstile.reset()`/`render`/`execute`, refresh `window.__turnstileToken`, await it) before `runCompare`, then **E2E-verify with a real sitekey here** (Task 2 Step 2 must confirm the A/B step actually streams after the gate). Also re-check the gate→`runCompare` path is retryable (don't strand the user on a `/compare` error). This MUST be resolved and verified before Build E live deploy.
+
 ## Global Constraints
 
 - Turnstile test keys (no account needed for local): sitekey `1x00000000000000000000AA` (always passes), secret `1x0000000000000000000000000000000AA` (always passes). Use a fail sitekey `2x00000000000000000000AB` to test the 403 path.
