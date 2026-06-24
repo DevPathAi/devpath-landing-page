@@ -94,14 +94,13 @@ test('builds Step 2 payload without erasing optional blanks', () => {
     stack: 'Java, Spring, JPA',
     recent_stuck_moment: 'N+1 문제를 보고 있는데 fetch join 기준이 헷갈립니다.',
     wtp_krw: '',
-    interview_opt_in: true,
   }, {
     now: '2026-06-24T00:05:00.000Z',
   });
 
   assert.equal(payload.wtp_krw, '');
-  assert.equal(payload.interview_opt_in, true);
   assert.equal(payload.step2_submitted_at, '2026-06-24T00:05:00.000Z');
+  assert.equal(payload.interview_opt_in, undefined);
 });
 
 test('mergeRows keeps prior values when incoming values are empty', () => {
@@ -128,7 +127,6 @@ test('createSafeDraft omits sensitive recent stuck moment from localStorage draf
     stack: 'Spring',
     recent_stuck_moment: 'https://github.com/acme/private-repo 에러입니다',
     wtp_krw: '15000',
-    interview_opt_in: true,
   }), {
     email: 'learner@example.com',
     current_stage: 'job_seeker',
@@ -136,7 +134,6 @@ test('createSafeDraft omits sensitive recent stuck moment from localStorage draf
     stack: 'Spring',
     recent_stuck_moment: '',
     wtp_krw: '15000',
-    interview_opt_in: true,
   });
 });
 

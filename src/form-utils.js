@@ -1,4 +1,4 @@
-export const CONSENT_VERSION = '2026-06-24-smoke-v1';
+export const CONSENT_VERSION = '2026-06-24-aiqa-v1';
 
 export const SUBMISSION_STATES = Object.freeze({
   idle: 'idle',
@@ -105,7 +105,6 @@ export function buildStep2Payload(data, context = {}) {
     stack: String(data.stack || '').trim(),
     recent_stuck_moment: String(data.recent_stuck_moment || '').trim(),
     wtp_krw: data.wtp_krw === '' || data.wtp_krw == null ? '' : Number(data.wtp_krw),
-    interview_opt_in: Boolean(data.interview_opt_in),
     step2_submitted_at: now,
     last_updated_at: now,
   };
@@ -120,7 +119,6 @@ export function createSafeDraft(data) {
     stack: data.stack || '',
     recent_stuck_moment: detectSensitiveInput(recentStuckMoment).length > 0 ? '' : recentStuckMoment,
     wtp_krw: data.wtp_krw || '',
-    interview_opt_in: Boolean(data.interview_opt_in),
   };
 }
 
